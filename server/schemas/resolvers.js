@@ -5,9 +5,10 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findOne({ _id: context.user._id })
-          .select("-__v -password")
-          .populate("savedBooks");
+        const userData = await User.findOne({ _id: context.user._id }).select(
+          "-__v -password"
+        );
+
         return userData;
       }
       throw new AuthenticationError("Not logged in");
@@ -33,7 +34,7 @@ const resolvers = {
     },
     saveBook: async (parent, { input }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
           { $push: { savedBooks: input } },
           { new: true }
@@ -44,7 +45,7 @@ const resolvers = {
     },
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate(
+        const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
           { $pull: { savedBooks: { bookId: bookId } } },
           { new: true }
